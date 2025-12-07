@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoConfiance – Vente de voitures (Dark mode & filtres)</title>
+
+    <meta name="description" content="Plateforme de vente de voitures en Côte d'Ivoire — annonces vérifiées, filtres en temps réel, mode sombre et interface mobile optimisée.">
+    <meta name="keywords" content="voiture occasion CI, vente voiture Abidjan, SUV, berline, 4x4, filtre voiture, dark mode">
+
+    <!-- Styles concentrés (copier aussi dans style.css si vous préférez séparé) -->
+    <style>
+      :root{
+        --accent:#ca7e44;
+        --accent-2:#ffb673;
+        --bg:#f5f7fa;
+        --card:#ffffff;
+        --muted:#706868;
+        --dark:#2b2626;
+        --glass: rgba(255,255,255,0.6);
+        --radius:12px;
+        --shadow: 0 8px 28px rgba(16,24,40,0.08);
+      }
+
+      /* Dark mode vars */
+      body.dark{
+        --bg: #0b0f13;
+        --card: #0f1720;
+        --muted: #9aa4ad;
+        --dark: #e6eef8;
+        --glass: rgba(255,255,255,0.03);
+        --shadow: 0 10px 30px rgba(2,6,23,0.6);
+      }
+
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--dark);background:linear-gradient(180deg,var(--bg),#e9f2f8);-webkit-font-smoothing:antialiased}
+      a{color:inherit}
+
+      .container{max-width:1100px;margin:0 auto;padding:0 16px}
+
+      /* Header */
+      header{padding:18px 16px;background:linear-gradient(90deg,var(--accent),#00a3ff);color:#fff;position:sticky;top:0;z-index:40}
+      .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+      .brand{display:flex;gap:12px;align-items:center}
+      .brand h1{font-size:18px;margin:0}
+      nav a{color:#fff;text-decoration:none;margin-left:14px;font-weight:600}
+
+      /* Dark toggle */
+      .controls{display:flex;gap:10px;align-items:center}
+      .btn{background:var(--card);border-radius:999px;padding:8px 12px;border:none;cursor:pointer;font-weight:700;box-shadow:var(--shadow)}
+      .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+
+      /* Hero layout */
+      .hero{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;padding:36px 0}
+      .hero h2{font-size:28px;margin:0 0 8px}
+      .hero p{margin:0 0 18px;color:var(--muted)}
+
+      /* Feature cards */
+      .features{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}
+      .feature{background:var(--card);padding:14px;border-radius:var(--radius);box-shadow:var(--shadow);flex:1;min-width:180px;transition:transform .25s ease,box-shadow .25s ease}
+      .feature:hover{transform:translateY(-6px)}
+
+      /* Search / filters */
+      .search-card{background:linear-gradient(180deg,var(--card),rgba(255,255,255,0.9));padding:18px;border-radius:var(--radius);box-shadow:var(--shadow);position:sticky;top:84px}
+      body.dark .search-card{background:linear-gradient(180deg,var(--card),rgba(255,255,255,0.02))}
+
+      .search-row{display:flex;gap:8px}
+      input[type='search'],select{padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);flex:1;font-size:14px;background:transparent;color:var(--dark)}
+      input::placeholder{color:var(--muted)}
+      .primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+
+      /* Grid & cards */
+      .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:12px}
+      .card{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);transition:transform .25s ease,box-shadow .25s ease,opacity .25s ease;opacity:1}
+      .card.hidden{opacity:0;pointer-events:none;transform:scale(.98);height:0;padding:0;margin:0}
+      .card:hover{transform:translateY(-8px)}
+
+      .card img{width:100%;height:210px;object-fit:cover;display:block}
+      .card-body{padding:14px}
+      .car-title{font-weight:800;margin-bottom:6px}
+      .meta{color:var(--muted);font-size:13px}
+      .price{color:var(--accent);font-weight:900;margin-top:10px}
+
+      /* Filters bar (mobile collapsed) */
+      .filters{display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap}
+      .chip{background:var(--glass);padding:8px 10px;border-radius:999px;font-weight:600;border:1px solid rgba(255,255,255,0.04)}
+
+      /* Footer */
+      footer{padding:28px 0;color:var(--muted);font-size:14px}
+
+      /* Animations */
+      @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+      .animate{animation:fadeInUp .45s cubic-bezier(.2,.8,.2,1) both}
+
+      /* Responsive */
+      @media(max-width:980px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.search-card{position:relative;top:auto}}
+      @media(max-width:600px){.grid{grid-template-columns:1fr}.topbar{flex-direction:column;align-items:flex-start}.hero{padding:18px 0}.search-card{width:100%}}
+
+      /* Accessibility helpers */
+      .visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip:rect(0 0 0 0);overflow:hidden}
+      /* AI chat styles */
+      #ai-button{position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:999px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);z-index:60}
+      #ai-chat{position:fixed;right:18px;bottom:84px;width:340px;max-height:60vh;background:var(--card);border-radius:12px;box-shadow:var(--shadow);display:none;flex-direction:column;overflow:hidden;z-index:60}
+      #ai-header{padding:12px;font-weight:700;border-bottom:1px solid rgba(0,0,0,0.06)}
+      #ai-messages{padding:12px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:8px}
+      .ai-message{padding:8px 10px;border-radius:8px;max-width:85%}
+      .ai-message.ai-user{align-self:flex-end;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff}
+      .ai-message.ai-bot{align-self:flex-start;background:var(--glass);color:var(--dark);border:1px solid rgba(0,0,0,0.04)}
+      #ai-input-area{display:flex;padding:8px;border-top:1px solid rgba(0,0,0,0.06)}
+      #ai-input{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)}
+      #ai-send{margin-left:8px;padding:8px 10px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+      .ai-typing{opacity:0.6;font-style:italic}
+    </style>
+
+  </head>
+  <body>
+
+    <header>
+      <div class="container topbar">
+        <div class="brand">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <rect width="24" height="24" rx="6" fill="#fff" opacity="0.06"></rect>
+            <path d="M4 13c0-4 3-7 7-7s7 3 7 7v3H4v-3z" fill="#fff" opacity="0.9"></path>
+          </svg>
+          <div>
+            <h1>AutoConfiance</h1>
+            <div style="font-size:12px;color:rgba(255,255,255,0.9)">Voitures neuves & d'occasion • Côte d'Ivoire</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <nav class="nav">
+            <a href="#catalog">Catalogue</a>
+            <a href="#services">Services</a>
+            <a href="#contact">Contact</a>
+          </nav>
+
+          <button id="toggleDark" class="btn" aria-pressed="false" title="Activer mode sombre">🌙</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container hero">
+      <div>
+        <h2>Trouvez la voiture qui vous ressemble</h2>
+        <p>Annonces vérifiées, recherche instantanée et filtre en temps réel pour une expérience fluide sur mobile et desktop.</p>
+
+        <div class="features">
+          <div class="feature animate">
+            <strong>Vérifié</strong>
+            <div style="margin-top:8px;color:var(--muted)">Contrôle technique et historique complet.</div>
+          </div>
+          <div class="feature animate" style="animation-delay:.06s">
+            <strong>Financement</strong>
+            <div style="margin-top:8px;color:var(--muted)">Offres adaptées et rapides.</div>
+          </div>
+          <div class="feature animate" style="animation-delay:.12s">
+            <strong>Livraison</strong>
+            <div style="margin-top:8px;color:var(--muted)">Livraison possible à Abidjan.</div>
+          </div>
+        </div>
+
+        <!-- Filters visibles sur desktop (mobile collapsible) -->
+        <div class="filters" role="region" aria-label="Filtres rapides">
+          <div class="chip">Filtre : <strong id="activeFilters">Tous</strong></div>
+          <div style="flex:1"></div>
+        </div>
+
+        <!-- Catalogue -->
+        <section id="catalog">
+          <h3>Nos dernières annonces</h3>
+
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input id="q" type="search" placeholder="Rechercher modèle, marque..." aria-label="Recherche" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06)">
+
+            <select id="type" aria-label="Type" style="padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06)">
+              <option value="">Tous types</option>
+              <option value="Berline">Berline</option>
+              <option value="SUV">SUV</option>
+              <option value="4x4">4x4</option>
+            </select>
+
+            <select id="budget" aria-label="Budget" style="padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.06)">
+              <option value="">Tous budgets</option>
+              <option value='{"max":3000000}'>Moins de 3 000 000 XOF</option>
+              <option value='{"min":3000000,"max":6000000}'>3 000 000 - 6 000 000 XOF</option>
+              <option value='{"min":6000000}'>Plus de 6 000 000 XOF</option>
+            </select>
+
+            <button id="clearFilters" class="primary" style="white-space:nowrap">Réinitialiser</button>
+          </div>
+
+          <div class="grid" id="listings" aria-live="polite">
+
+            <!-- Exemple de carte avec data-attributes pour filtrage -->
+            <article class="card animate" data-model="toyota corolla" data-type="Berline" data-price="3800000">
+              <img loading="lazy" src="toyo.png" alt="Toyota Corolla 2018">
+              <div class="card-body">
+                <div class="car-title">Toyota Corolla 2018</div>
+                <div class="meta">Abidjan • 120 000 km • Essence • Manuelle</div>
+                <div class="price">3 800 000 XOF</div>
+              </div>
+            </article>
+
+            <article class="card animate" data-model="renault duster" data-type="4x4" data-price="4250000">
+              <img loading="lazy" src="dester.jpg" alt="Renault Duster 2017">
+              <div class="card-body">
+                <div class="car-title">Renault Duster 2017</div>
+                <div class="meta">Abidjan • 95 000 km • Diesel • 4x4</div>
+                <div class="price">4 250 000 XOF</div>
+              </div>
+            </article>
+
+            <article class="card animate" data-model="mercedes classe c" data-type="Berline" data-price="9500000">
+              <img loading="lazy" src="merco.jpg" alt="Mercedes Classe C 2016">
+              <div class="card-body">
+                <div class="car-title">Mercedes Classe C 2016</div>
+                <div class="meta">Abidjan • 75 000 km • Essence • Automatique</div>
+                <div class="price">9 500 000 XOF</div>
+              </div>
+            </article>
+
+            <!-- Ajoutez d'autres annonces ici avec les mêmes data-attributes -->
+
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Sidebar / Search card -->
+      <aside>
+        <div class="search-card">
+          <h4>Filtres avancés</h4>
+          <p style="color:var(--muted);margin-top:4px">Affinez en temps réel</p>
+
+          <div style="margin-top:12px;display:flex;gap:8px;flex-direction:column">
+            <label class="visually-hidden" for="qSidebar">Recherche</label>
+            <input id="qSidebar" placeholder="Marque, modèle, année..." />
+
+            <label class="visually-hidden" for="minKm">Kilométrage max</label>
+            <input id="minKm" placeholder="Kilométrage max" />
+
+            <label class="visually-hidden" for="fuel">Carburant</label>
+            <select id="fuel">
+              <option value="">Tous carburants</option>
+              <option value="Essence">Essence</option>
+              <option value="Diesel">Diesel</option>
+            </select>
+
+            <div style="display:flex;gap:8px">
+              <button id="applyFilters" class="primary" style="flex:1">Appliquer</button>
+              <button id="toggleMap" class="btn ghost" style="flex:0">Carte</button>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top:16px;background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow)">
+          <h4>Vendre votre voiture</h4>
+          <p style="color:var(--muted)">Déposez une annonce en quelques étapes.</p>
+          <a href="#" class="primary" style="display:inline-block;margin-top:10px;text-decoration:none">Déposer une annonce</a>
+        </div>
+      </aside>
+    </main>
+
+    <main class="container">
+      <section id="services" style="margin-top:28px">
+        <h3>Nos services</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+          <div style="background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);flex:1;min-width:220px">
+            <strong>Inspection complète</strong>
+            <div style="margin-top:8px;color:var(--muted)">Rapport détaillé et photos.</div>
+          </div>
+
+          <div style="background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);flex:1;min-width:220px">
+            <strong>Financement & assurance</strong>
+            <div style="margin-top:8px;color:var(--muted)">Solutions adaptées.</div>
+          </div>
+
+          <div style="background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);flex:1;min-width:220px">
+            <strong>Reprise & estimation</strong>
+            <div style="margin-top:8px;color:var(--muted)">Évaluation rapide.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" style="margin-top:24px">
+        <h3>Contact</h3>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;margin-top:12px">
+          <div style="background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow)">
+            <form id="contactForm">
+              <label>Nom et prénom</label>
+              <input type="text" required />
+
+              <label>Email</label>
+              <input type="email" required />
+
+              <label>Message</label>
+              <textarea rows="4" required></textarea>
+
+              <button class="primary" type="submit">Envoyer</button>
+            </form>
+          </div>
+
+          <aside style="background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow)">
+            <strong>Infos</strong>
+            <div style="margin-top:8px;color:var(--muted)">
+              Adresse : Abidjan, Cocody, Angré<br>
+              Téléphone : +225 01 04 42 70 06<br>
+              Email : scootmanu8@gmail.com
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer style="margin-top:28px">
+      <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+        <div>&copy; <strong>AutoConfiance</strong> — Tous droits réservés</div>
+        <div style="color:var(--muted)">Mentions légales • Politique de confidentialité</div>
+      </div>
+    </footer>
+
+    <!-- Scripts: filtrage instantané, dark mode, accessibility -->
+    <script>
+      // Dark mode toggle + persist
+      const toggle = document.getElementById('toggleDark');
+      const body = document.body;
+      const saved = localStorage.getItem('ac_dark');
+      if(saved === '1') body.classList.add('dark');
+      toggle.addEventListener('click', ()=>{
+        const isDark = body.classList.toggle('dark');
+        toggle.setAttribute('aria-pressed', String(isDark));
+        localStorage.setItem('ac_dark', isDark ? '1' : '0');
+      });
+
+      // Live filtering
+      const q = document.getElementById('q');
+      const type = document.getElementById('type');
+      const budget = document.getElementById('budget');
+      const listings = document.getElementById('listings');
+      const cards = [...listings.querySelectorAll('.card')];
+      const activeFilters = document.getElementById('activeFilters');
+
+      function parseBudgetValue(optionValue){
+        // Some selects may contain JSON-like strings; try parse
+        try{ return JSON.parse(optionValue); }catch(e){ return null }
+      }
+
+      function matchesCard(card){
+        const text = (card.dataset.model || '').toLowerCase();
+        const qVal = (q.value || '').trim().toLowerCase();
+        if(qVal && !text.includes(qVal)) return false;
+        const typeVal = type.value;
+        if(typeVal && (card.dataset.type !== typeVal)) return false;
+        const budgetVal = budget.value;
+        if(budgetVal){
+          const b = parseBudgetValue(budgetVal);
+          const price = Number(card.dataset.price || 0);
+          if(b){
+            if(b.min && price < b.min) return false;
+            if(b.max && price > b.max) return false;
+          }
+        }
+        return true;
+      }
+
+      function applyFilter(){
+        let anyVisible = 0;
+        cards.forEach(card=>{
+          if(matchesCard(card)){
+            card.classList.remove('hidden');
+            card.style.display = '';
+            anyVisible++;
+          } else {
+            card.classList.add('hidden');
+            card.style.display = 'none';
+          }
+        });
+        const active = [];
+        if(q.value) active.push('Recherche');
+        if(type.value) active.push(type.value);
+        if(budget.value) active.push('Budget');
+        activeFilters.textContent = active.length ? active.join(' • ') : 'Tous';
+      }
+
+      // Debounce helper for input
+      function debounce(fn, wait=200){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), wait) } }
+      const debounced = debounce(applyFilter, 180);
+      [q,type,budget].forEach(el=>el.addEventListener('input', debounced));
+
+      // Sidebar inputs
+      document.getElementById('qSidebar').addEventListener('input', (e)=>{ q.value = e.target.value; debounced(); });
+      document.getElementById('applyFilters').addEventListener('click', ()=>{ q.value = document.getElementById('qSidebar').value || q.value; applyFilter(); });
+      document.getElementById('clearFilters').addEventListener('click', ()=>{ q.value=''; type.value=''; budget.value=''; document.getElementById('qSidebar').value=''; applyFilter(); });
+
+      // Contact form simple handler
+      document.getElementById('contactForm').addEventListener('submit', (e)=>{ e.preventDefault(); alert('Merci — nous avons bien reçu votre message.'); e.target.reset(); });
+
+      // Initial filter apply
+      applyFilter();
+
+      // Small progressive enhancement: animate appearance
+      document.addEventListener('DOMContentLoaded', ()=>{ document.querySelectorAll('.animate').forEach((el,i)=>{ el.style.animationDelay = (i*60)+'ms' }) });
+
+      
+    </script>
+      <!-- Assistant vendeur IA -->
+    <div id="ai-button">🛍️</div>
+    <div id="ai-chat">
+        <div id="ai-header">Assistant Vendeur</div>
+        <div id="ai-messages"></div>
+        <div id="ai-input-area">
+            <input id="ai-input" type="text" placeholder="Posez votre question sur les voitures..." />
+            <button id="ai-send">➤</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("ai-button").onclick = () => {
+            const chat = document.getElementById("ai-chat");
+            chat.style.display = chat.style.display === "flex" ? "none" : "flex";
+        };
+
+        async function sendMessageToAI(message) {
+          // Determine API base: prefer explicit client override, otherwise
+          // when opened via file:// use localhost backend so fetch resolves correctly.
+          const API_BASE = window.AI_API_BASE || (location.protocol === 'file:' ? 'http://localhost:5000' : '');
+          // Call backend proxy which secures the API key server-side.
+          try {
+            const headers = { 'Content-Type': 'application/json' };
+            // send client-side proxy token if configured for testing
+            if (window.AI_CLIENT_TOKEN) headers['x-ai-key'] = window.AI_CLIENT_TOKEN;
+
+            const r = await fetch(`${API_BASE}/api/ai/chat`, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify({ message })
+            });
+
+            if (!r.ok) {
+              const txt = await r.text();
+              return `Erreur serveur: ${r.status} ${txt}`;
+            }
+
+            const data = await r.json();
+            if (data.demo) return data.reply;
+            return data.reply || 'Pas de réponse disponible.';
+          } catch (err) {
+            return `Erreur réseau: ${err.message}`;
+          }
+        }
+
+        document.getElementById("ai-send").onclick = async () => {
+          const input = document.getElementById("ai-input");
+          const text = input.value.trim();
+          if (!text) return;
+
+          addMessage(text, "ai-user");
+          input.value = "";
+
+          // show temporary typing indicator
+          const typingId = `typing-${Date.now()}`;
+          const typingEl = document.createElement('div');
+          typingEl.id = typingId;
+          typingEl.className = 'ai-message ai-bot ai-typing';
+          typingEl.textContent = 'En train de répondre...';
+          document.getElementById('ai-messages').appendChild(typingEl);
+          scrollAiMessages();
+
+          const reply = await sendMessageToAI(text);
+
+          // remove typing indicator and add real reply
+          const tEl = document.getElementById(typingId);
+          if (tEl) tEl.remove();
+          addMessage(reply, 'ai-bot');
+        };
+
+        function scrollAiMessages() {
+          const box = document.getElementById('ai-messages');
+          if (!box) return;
+          box.scrollTop = box.scrollHeight;
+        }
+
+        function addMessage(text, type) {
+          const msg = document.createElement("div");
+          msg.className = `ai-message ${type}`;
+          msg.textContent = text;
+          document.getElementById("ai-messages").appendChild(msg);
+          // ensure newest message is visible
+          setTimeout(()=>{ const box = document.getElementById('ai-messages'); if(box) box.scrollTop = box.scrollHeight; }, 0);
+        }
+      </script>
+
+    </html>
