@@ -1,21 +1,277 @@
-/* Minimal stylesheet so import in main.jsx succeeds. */
-html, body, #root {
-  height: 100%;
-}
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  background: #f8fafc;
+/* Modern, polished base stylesheet for the frontend app */
+:root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --accent: #0ea5a4;
+    /* teal */
+    --accent-2: #ffb573;
+    /* warm */
+    --text: #0f172a;
+    --radius: 12px;
+    --shadow-sm: 0 4px 10px rgba(16, 24, 40, 0.06);
+    --shadow-lg: 0 12px 30px rgba(16, 24, 40, 0.12);
 }
 
-/* Tailwind not configured here; include minimal utility classes fallback if needed. */
-.container { max-width: 1024px; margin: 0 auto; padding: 1rem; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-4 { margin-top: 1rem; }
-.p-4 { padding: 1rem; }
-.bg-white { background: #fff; }
-.rounded { border-radius: 0.375rem; }
-.shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.flex { display:flex; }
-.gap-4 { gap:1rem; }
-.text-xl { font-size:1.25rem; }
+html,
+body,
+#root {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    color: var(--text);
+    background: linear-gradient(180deg, var(--bg), #eef6fb);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.45;
+}
+
+/* Layout utilities */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cards */
+.card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 1rem;
+}
+
+.card-lg {
+    padding: 1.5rem;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.95rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: #fff;
+}
+
+.btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    color: var(--text);
+}
+
+/* Typography */
+h1,
+h2,
+h3 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 800;
+    color: var(--text);
+}
+
+h1 {
+    font-size: 1.75rem
+}
+
+h2 {
+    font-size: 1.25rem
+}
+
+p {
+    margin: 0 0 0.75rem 0;
+    color: var(--muted);
+}
+
+/* Grid for listings */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.grid .card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width:980px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width:600px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 0.75rem
+    }
+
+    h1 {
+        font-size: 1.4rem
+    }
+}
+
+/* Form controls */
+input[type='text'],
+input[type='search'],
+input[type='email'],
+textarea,
+select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    background: #fff;
+    color: var(--text);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical
+}
+
+/* Small helpers (kept for compatibility) */
+.mt-2 {
+    margin-top: 0.5rem
+}
+
+.mt-4 {
+    margin-top: 1rem
+}
+
+.p-4 {
+    padding: 1rem
+}
+
+.bg-white {
+    background: var(--card)
+}
+
+.rounded {
+    border-radius: 0.375rem
+}
+
+.shadow {
+    box-shadow: var(--shadow-sm)
+}
+
+.flex {
+    display: flex
+}
+
+.gap-4 {
+    gap: 1rem
+}
+
+.text-xl {
+    font-size: 1.125rem
+}
+
+/* Footer / small text */
+.muted {
+    color: var(--muted);
+    font-size: 0.95rem
+}
+
+/* Simple UI: AI chat widget defaults */
+#ai-button {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    z-index: 60;
+    cursor: pointer
+}
+
+#ai-chat {
+    position: fixed;
+    right: 18px;
+    bottom: 88px;
+    width: 360px;
+    max-height: 70vh;
+    display: none;
+    flex-direction: column;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 60
+}
+
+#ai-header {
+    padding: 12px 14px;
+    font-weight: 800;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.04)
+}
+
+#ai-messages {
+    padding: 12px;
+    overflow: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px
+}
+
+.ai-message {
+    padding: 8px 10px;
+    border-radius: 10px;
+    max-width: 85%;
+}
+
+.ai-message.ai-user {
+    align-self: flex-end;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: #fff
+}
+
+.ai-message.ai-bot {
+    align-self: flex-start;
+    background: rgba(2, 6, 23, 0.03);
+    color: var(--text);
+    border: 1px solid rgba(15, 23, 42, 0.03)
+}
